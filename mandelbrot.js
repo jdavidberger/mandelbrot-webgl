@@ -4,10 +4,10 @@ $(function() {
 	var canvas = $("canvas")[0]; 
 	var imgCanvas = $("canvas")[1]; 
 	var width = 512; 
-	var height = 512; 
+	var height = width; 
 	imgCanvas.width = imgCanvas.height = 
 	canvas.width = canvas.height = width; 
-	var GL = canvas.getContext("webgl", {preserveDrawingBuffer: true, antialias:true});
+	var GL = canvas.getContext("webgl", {preserveDrawingBuffer: true, antialias:false});
 	var ctx = imgCanvas.getContext("2d"); 
 	GL.viewportWidth = canvas.width;
     GL.viewportHeight = canvas.height;

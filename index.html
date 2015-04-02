@@ -13,12 +13,19 @@
 	}
 </pre>
 <pre style="display:none" id="fragment">
-	precision highp float;
+	precision lowp float;
 
 	varying vec2 vPosition;
 	uniform sampler2D sampler2d;
 	uniform float idx; 
 	
+	float getScale(float idx) {
+		if(idx < 10.0)
+			return 6.0; 
+		else if(idx < 20.0)
+			return 4.0; 
+		return 3.0; 
+	}
 	void main(void) {
 		float x = vPosition.x * 2.0;
 		float y = vPosition.y * 2.0;
@@ -26,21 +33,22 @@
 		float tx = (vPosition.x + 1.0) / 2.0;
 		float ty = (vPosition.y + 1.0) / 2.0; 
 		
-		float scale = 6.0; 
+		float scale = getScale(idx); 
 		vec4 zn = texture2D(sampler2d, vec2(tx,ty)) * scale - (scale / 2.0);
-
+		scale = getScale(idx+1.0); 
+		
 		if(idx == 0.0) {
 			zn = vec4(0.0, 0.0, 0.0, 0.0);
 		}
 		vec2 zn1 = vec2(zn.x * zn.x - zn.y * zn.y, 2.0 * zn.x * zn.y) + vec2(x, abs(y)); 
-		float b = 1.0;
+		float b = 0.0;
 			
-		if((abs(zn1.x) < 2.0 && abs(zn1.y) < 2.0 && (zn.z < 0.5)) || idx < 2.0) {
-			b = 0.0; 			
+		if((abs(zn1.x) < 2.0 && abs(zn1.y) < 2.0 && (zn.z > 0.5)) || idx < 2.0) {
+			b = 1.0; 			
 			zn1 = zn1.xy / scale + 0.5;
-		} else {
-			//zn1 = vec2(0.0, 0.0);
+		} else {			
 			zn1 = zn.xy; 
+			//zn1 = vec2(0.0, 0.0);
 		}		
 		gl_FragColor = vec4(zn1, b, 1.0);			
 	}
