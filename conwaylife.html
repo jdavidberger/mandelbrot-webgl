@@ -64,16 +64,14 @@
 			return;
 		}
 	
-		ivec3 neigh = ivec3(0, 0, 0);
+		int neigh = 0;
 		for(int i = -1;i < 2;i++) {			
 			for(int j = -1;j < 2;j++) {
 				if(j != 0 || i != 0) {
-					vec4 cells = texture2D(sampler2d, vec2(tx + float(i) * dx, ty + float(j) * dy));
-					for(int z = 0;z < 3;z++) {
-						if(cells[z] < 0.5) {
-							neigh[z] = neigh[z] + 1;
-						}
-					}
+					vec4 cells = texture2D(sampler2d, vec2(tx + float(i) * dx, ty + float(j) * dy));					
+					if(cells[0] < 0.5) {
+						neigh = neigh + 1;
+					}					
 				}
 			}
 		}
@@ -82,16 +80,19 @@
 		vec3 dead  = vec3(1.0, 1.0, 1.0); 	
 		vec3 alive = vec3(0.0, 0.0, 0.0); 
 		vec3 rtn = dead;
-		
-		for(int z = 0;z < 3;z++) {
-			if(neigh[z] == 3) {
-				rtn[z] = alive[z]; 
-			} else if(my_cell[z] < 0.5 && neigh[z] >= 2 && neigh[z] <= 3) {
-				rtn[z] = alive[z]; 
+				
+		if(neigh == 3) {
+			rtn = alive; 
+		} else if(my_cell[0] < 0.5 && neigh >= 2 && neigh <= 3) {
+			rtn = alive; 
+		} else {
+			if(my_cell.x < 0.5) {
+				rtn = vec3(1.0, 0.0, 0.0);
 			} else {
-				rtn[z] = dead[z];
-			}	
-		}
+				rtn = vec3(1.0, my_cell.y + 0.01, my_cell.z + 0.1); 
+			}
+		}	
+		
 		gl_FragColor = vec4(rtn, 1.0); 
 	}
 </pre>
