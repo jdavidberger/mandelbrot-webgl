@@ -24,7 +24,7 @@
 			return 6.0; 
 		else if(idx < 20.0)
 			return 4.0; 
-		return 3.0; 
+		return 3.2; 
 	}
 	void main(void) {
 		float x = vPosition.x * 2.0;
@@ -49,6 +49,7 @@
 		} else {			
 			zn1 = zn.xy; 
 			//zn1 = vec2(0.0, 0.0);
+			discard; 
 		}		
 		gl_FragColor = vec4(zn1, b, 1.0);			
 	}

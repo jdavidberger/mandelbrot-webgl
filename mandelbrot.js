@@ -111,11 +111,9 @@ $(function() {
 
 	ctx.putImageData(imgData, 0, 0); 
 	applyTexture();
-	if(idx < 10) {
-		window.setTimeout(animate, 500); 
-	} else if(idx < 50) {		
-		window.requestAnimationFrame(animate);
-	}
+	
+	//window.requestAnimationFrame(animate);
+	window.setTimeout(animate, 100);
   };
 	
   animate();
