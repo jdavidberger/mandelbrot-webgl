@@ -3,10 +3,14 @@
 $(function() {
 	var canvas = $("canvas")[0]; 
 	var imgCanvas = $("canvas")[1]; 
-	var width = 512; 
-	var height = 512; 
-	imgCanvas.width = canvas.width = width; 
-	imgCanvas.height = canvas.height = height; 
+	var width = 512;
+	var height =  512;
+	width = width - width % 2;
+	height = height - height % 2;
+	canvas.width = width; 
+	canvas.height = height; 
+	imgCanvas.width = width;
+	imgCanvas.height = height;
 	var GL = canvas.getContext("webgl", {preserveDrawingBuffer: true, antialias:false});
 	var ctx = imgCanvas.getContext("2d"); 
 	GL.viewportWidth = canvas.width;
@@ -70,10 +74,13 @@ $(function() {
 		GL.bindTexture(GL.TEXTURE_2D, texture);
 		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.REPEAT);
 		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.REPEAT);		
+		//GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE); //Prevents s-coordinate wrapping (repeating).
+		//GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE); //Prevents t-coordinate wrapping (repeating).		
 		GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, imgCanvas);
-		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
-		GL.generateMipmap(GL.TEXTURE_2D);
+		//GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+		//GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
+		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+		//GL.generateMipmap(GL.TEXTURE_2D);
 		GL.bindTexture(GL.TEXTURE_2D, null);
 
 		GL.activeTexture(GL.TEXTURE0);
@@ -98,6 +105,9 @@ $(function() {
 
     GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, TRIANGLE_FACES);
 	GL.uniform1f(GL.getUniformLocation(SHADER_PROGRAM, "timestamp"), (new Date).getTime());
+	GL.uniform1f(GL.getUniformLocation(SHADER_PROGRAM, "width"), width);
+    GL.uniform1f(GL.getUniformLocation(SHADER_PROGRAM, "height"), height);
+    
     GL.drawElements(GL.TRIANGLE_FAN, 4, GL.UNSIGNED_SHORT, 0);	
     GL.flush();
 
