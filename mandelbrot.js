@@ -62,7 +62,8 @@ $(function() {
   GL.bufferData(GL.ELEMENT_ARRAY_BUFFER,
                 new Uint16Array(trianGLe_faces),
     GL.STATIC_DRAW);
-
+	
+	
 	var texture = GL.createTexture();
 	
 	var applyTexture = function() {
@@ -77,8 +78,8 @@ $(function() {
 		GL.bindTexture(GL.TEXTURE_2D, texture);
 		GL.uniform1i(GL.getUniformLocation(SHADER_PROGRAM, "sampler2d"), 0); 
 		GL.uniform1f(GL.getUniformLocation(SHADER_PROGRAM, "idx"), idx++);
-	}
 	
+	}
   GL.clearColor(0.0, 0.0, 0.0, 0.0);
 
   
@@ -94,6 +95,7 @@ $(function() {
     GL.vertexAttribPointer(_position, 	2, GL.FLOAT, false, float_size*(2), 0);
 
     GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, TRIANGLE_FACES);
+	GL.uniform1f(GL.getUniformLocation(SHADER_PROGRAM, "timestamp"), (new Date).getTime());
     GL.drawElements(GL.TRIANGLE_FAN, 4, GL.UNSIGNED_SHORT, 0);	
     GL.flush();
 
@@ -112,8 +114,8 @@ $(function() {
 	ctx.putImageData(imgData, 0, 0); 
 	applyTexture();
 	
-	//window.requestAnimationFrame(animate);
-	window.setTimeout(animate, 100);
+	window.requestAnimationFrame(animate);
+	//window.setTimeout(animate, 100);
   };
 	
   animate();

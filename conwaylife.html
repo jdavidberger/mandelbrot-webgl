@@ -18,6 +18,7 @@
 	varying vec2 vPosition;
 	uniform sampler2D sampler2d;
 	uniform float idx; 
+	uniform float timestamp; 
 	
 	// Input: It uses texture coords as the random number seed.
 	// Output: Random number: [0,1), that is between 0.0 and 0.999999... inclusive.
@@ -26,30 +27,31 @@
 
 	float rand( vec2 p )
 	{
+		float seed = 42.0;
 	  // We need irrationals for pseudo randomness.
 	  // Most (all?) known transcendental numbers will (generally) work.
 	  vec2 r = vec2(
 		23.1406926327792690,  // e^pi (Gelfond's constant)
-		 2.6651441426902251); // 2^sqrt(2) (Gelfond–Schneider constant)
-	  return fract( cos( mod( 123456789., 1e-7 + 256. * dot(p*cos(idx+1.0),r) ) ) );  
+		 2.6651441426902251) * cos(timestamp); // 2^sqrt(2) (Gelfond–Schneider constant)
+	  return fract( cos( mod( 123456789., 1e-7 + 256. * dot(p*cos(idx+seed),r) ) ) );  
 	}	
 	
 	
 	void main(void) {
-		float grid_size = 512.0; 
+		float grid_size = 256.0; 
 		
-		float x = vPosition.x;
-		float y = vPosition.y;
+		float x = vPosition.x - mod(vPosition.x, 1.0 / grid_size) + 1.0 / grid_size / 2.0;
+		float y = vPosition.y - mod(vPosition.y, 1.0 / grid_size) + 1.0 / grid_size / 2.0;
 		
 		float tx = (x + 1.0) / 2.0;
 		float ty = (y + 1.0) / 2.0; 
 			
-		float dx = 1.0 / grid_size; 
-		float dy = 1.0 / grid_size; 
+		float dx = 1.0 / grid_size / 2.0; 
+		float dy = 1.0 / grid_size / 2.0; 
 		vec2 seed = vec2(tx, ty); 
 		
-		if(idx == 0.0) {		
-			float prob = 0.1; 
+		if(idx < 1.0 ) {		
+			float prob = 0.5; 
 			gl_FragColor = vec4(step(rand(seed), prob), 
 								step(rand(seed), prob), 
 								step(rand(seed), prob), 1.0); 
@@ -57,11 +59,10 @@
 		}
 	
 		ivec3 neigh = ivec3(0, 0, 0);
-		for(int i = -1;i < 2;i++) {
-			if(i != 0)
+		for(int i = -1;i < 2;i++) {			
 			for(int j = -1;j < 2;j++) {
-				if(j != 0) {
-					vec4 cells = texture2D(sampler2d, vec2(tx + float(i) * dx,ty + float(j) * dy));
+				if(j != 0 || i != 0) {
+					vec4 cells = texture2D(sampler2d, vec2(tx + float(i) * dx, ty + float(j) * dy));
 					for(int z = 0;z < 3;z++) {
 						if(cells[z] < 0.5) {
 							neigh[z] = neigh[z] + 1;
@@ -74,7 +75,7 @@
 		
 		vec3 dead  = vec3(1.0, 1.0, 1.0); 	
 		vec3 alive = vec3(0.0, 0.0, 0.0); 
-		vec3 rtn = vec3(0.0, 0.0, 0.0); 
+		vec3 rtn = dead;
 		
 		for(int z = 0;z < 3;z++) {
 			if(neigh[z] == 3) {
